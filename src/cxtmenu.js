@@ -323,6 +323,7 @@ let cxtmenu = function (params) {
     let panEnabled;
     let boxEnabled;
     let gestureStartEvent;
+    let commandJustExecuted = false;
 
     let restoreZoom = function () {
       if (zoomEnabled) {
@@ -362,34 +363,39 @@ let cxtmenu = function (params) {
         updatePixelRatio();
       })
       .on(options.openMenuEvents, options.selector, function (e) {
+        console.log(e);
         target = this; // Remember which node the context menu is for
         let ele = this;
         let isCy = this === cy;
 
-        if (inGesture) {
-          parent.style.display = 'none';
+        console.log(commandJustExecuted);
 
-          inGesture = false;
+        if (!commandJustExecuted) {
+          if (inGesture) {
+            parent.style.display = 'none';
 
-          restoreGestures();
-        }
+            inGesture = false;
 
-        if (typeof options.commands === 'function') {
-          const res = options.commands(target);
-          if (res.then) {
-            res.then(_commands => {
-              commands = _commands;
+            restoreGestures();
+          }
+
+          if (typeof options.commands === 'function') {
+            const res = options.commands(target);
+            if (res.then) {
+              res.then(_commands => {
+                commands = _commands;
+                openMenu();
+              });
+            }
+            else {
+              commands = res;
               openMenu();
-            });
+            }
           }
           else {
-            commands = res;
+            commands = options.commands;
             openMenu();
           }
-        }
-        else {
-          commands = options.commands;
-          openMenu();
         }
 
         function openMenu() {
@@ -448,7 +454,7 @@ let cxtmenu = function (params) {
           gestureStartEvent = e;
         }
       })
-      .on('cxtdrag tapdrag tapstart', options.selector, dragHandler = function (e) {
+      .on('tapdrag tapstart', options.selector, dragHandler = function (e) {
 
         if (!inGesture) {
           return;
@@ -473,7 +479,7 @@ let cxtmenu = function (params) {
         let cosTheta = (dy * dy - d * d - dx * dx) / (-2 * d * dx);
         let theta = Math.acos(cosTheta);
 
-        if (d < rs + options.spotlightPadding || d > options.menuRadius) {
+        if (d < rs + options.spotlightPadding || d > containerSize / 2) {
           queueDrawBg();
           return;
         }
@@ -513,7 +519,7 @@ let cxtmenu = function (params) {
         queueDrawCommands(rx, ry, theta);
       })
       .on('tapdrag tapstart', dragHandler)
-      .on('tapend', function () {
+      .on('tapend', function (e) {
         parent.style.display = 'none';
 
         if (activeCommandI !== undefined) {
@@ -522,11 +528,14 @@ let cxtmenu = function (params) {
           if (select) {
             select.apply(target, [target, gestureStartEvent]);
             activeCommandI = undefined;
+            commandJustExecuted = true;
+            setTimeout(() => {
+              commandJustExecuted = false;
+            }, 500);
           }
         }
 
         inGesture = false;
-
         restoreGestures();
       });
   }
