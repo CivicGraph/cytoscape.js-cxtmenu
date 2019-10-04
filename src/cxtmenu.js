@@ -2,7 +2,7 @@ const defaults = require('./defaults');
 const assign = require('./assign');
 const { removeEles, setStyles, createElement, getPixelRatio, getOffset } = require('./dom-util');
 
-let cxtmenu = function(params){
+let cxtmenu = function (params) {
   let options = assign({}, defaults, params);
   let cy = this;
   let container = cy.container();
@@ -11,16 +11,16 @@ let cxtmenu = function(params){
   let data = {
     options: options,
     handlers: [],
-    container: createElement({class: 'cxtmenu'})
+    container: createElement({ class: 'cxtmenu' })
   };
 
   let wrapper = data.container;
   let parent = createElement();
-  let canvas = createElement({tag: 'canvas'});
+  let canvas = createElement({ tag: 'canvas' });
   let commands = [];
   let c2d = canvas.getContext('2d');
   let r = options.menuRadius;
-  let containerSize = (r + options.activePadding)*2;
+  let containerSize = (r + options.activePadding) * 2;
   let activeCommandI;
   let offset;
 
@@ -50,8 +50,8 @@ let cxtmenu = function(params){
     height: containerSize + 'px',
     position: 'absolute',
     zIndex: 1,
-    marginLeft: - options.activePadding + 'px',
-    marginTop: - options.activePadding + 'px',
+    marginLeft: -options.activePadding + 'px',
+    marginTop: -options.activePadding + 'px',
     userSelect: 'none'
   });
 
@@ -71,7 +71,7 @@ let cxtmenu = function(params){
       let rx1 = 0.66 * r * Math.cos(midtheta);
       let ry1 = 0.66 * r * Math.sin(midtheta);
 
-      let item = createElement({class: 'cxtmenu-item'});
+      let item = createElement({ class: 'cxtmenu-item' });
       setStyles(item, {
         color: options.itemColor,
         cursor: 'default',
@@ -89,11 +89,12 @@ let cxtmenu = function(params){
         marginTop: (-ry1 - r * 0.33) + 'px'
       });
 
-      let content = createElement({class: 'cxtmenu-content'});
+      let content = createElement({ class: 'cxtmenu-content' });
 
-      if( command.content instanceof HTMLElement ){
-        content.appendChild( command.content );
-      } else {
+      if (command.content instanceof HTMLElement) {
+        content.appendChild(command.content);
+      }
+      else {
         content.innerHTML = command.content;
       }
 
@@ -118,11 +119,11 @@ let cxtmenu = function(params){
     }
   }
 
-  function queueDrawBg( rspotlight ){
-    redrawQueue.drawBg = [ rspotlight ];
+  function queueDrawBg(rspotlight) {
+    redrawQueue.drawBg = [rspotlight];
   }
 
-  function drawBg( rspotlight ){
+  function drawBg(rspotlight) {
     rspotlight = rspotlight !== undefined ? rspotlight : rs;
 
     c2d.globalCompositeOperation = 'source-over';
@@ -131,19 +132,20 @@ let cxtmenu = function(params){
 
     // draw background items
     c2d.fillStyle = options.fillColor;
-    let dtheta = 2*Math.PI/(commands.length);
-    let theta1 = Math.PI/2;
+    let dtheta = 2 * Math.PI / (commands.length);
+    let theta1 = Math.PI / 2;
     let theta2 = theta1 + dtheta;
 
-    for( let index = 0; index < commands.length; index++ ){
+    for (let index = 0; index < commands.length; index++) {
       let command = commands[index];
 
-      if( command.fillColor ){
+      if (command.fillColor) {
         c2d.fillStyle = command.fillColor;
       }
       c2d.beginPath();
       c2d.moveTo(r + options.activePadding, r + options.activePadding);
-      c2d.arc(r + options.activePadding, r + options.activePadding, r, 2*Math.PI - theta1, 2*Math.PI - theta2, true);
+      c2d.arc(r + options.activePadding, r + options.activePadding, r, 2 * Math.PI - theta1, 2 * Math.PI - theta2,
+        true);
       c2d.closePath();
       c2d.fill();
 
@@ -157,10 +159,10 @@ let cxtmenu = function(params){
     c2d.globalCompositeOperation = 'destination-out';
     c2d.strokeStyle = 'white';
     c2d.lineWidth = options.separatorWidth;
-    theta1 = Math.PI/2;
+    theta1 = Math.PI / 2;
     theta2 = theta1 + dtheta;
 
-    for( let i = 0; i < commands.length; i++ ){
+    for (let i = 0; i < commands.length; i++) {
       let rx1 = r * Math.cos(theta1);
       let ry1 = r * Math.sin(theta1);
       c2d.beginPath();
@@ -173,24 +175,24 @@ let cxtmenu = function(params){
       theta2 += dtheta;
     }
 
-
     c2d.fillStyle = 'white';
     c2d.globalCompositeOperation = 'destination-out';
     c2d.beginPath();
-    c2d.arc(r + options.activePadding, r + options.activePadding, rspotlight + options.spotlightPadding, 0, Math.PI*2, true);
+    c2d.arc(r + options.activePadding, r + options.activePadding, rspotlight + options.spotlightPadding, 0, Math.PI * 2,
+      true);
     c2d.closePath();
     c2d.fill();
 
     c2d.globalCompositeOperation = 'source-over';
   }
 
-  function queueDrawCommands( rx, ry, theta ){
-    redrawQueue.drawCommands = [ rx, ry, theta ];
+  function queueDrawCommands(rx, ry, theta) {
+    redrawQueue.drawCommands = [rx, ry, theta];
   }
 
-  function drawCommands( rx, ry, theta ){
-    let dtheta = 2*Math.PI/(commands.length);
-    let theta1 = Math.PI/2;
+  function drawCommands(rx, ry, theta) {
+    let dtheta = 2 * Math.PI / (commands.length);
+    let theta1 = Math.PI / 2;
     let theta2 = theta1 + dtheta;
 
     theta1 += dtheta * activeCommandI;
@@ -201,41 +203,42 @@ let cxtmenu = function(params){
     c2d.lineWidth = 1;
     c2d.beginPath();
     c2d.moveTo(r + options.activePadding, r + options.activePadding);
-    c2d.arc(r + options.activePadding, r + options.activePadding, r + options.activePadding, 2*Math.PI - theta1, 2*Math.PI - theta2, true);
+    c2d.arc(r + options.activePadding, r + options.activePadding, r + options.activePadding, 2 * Math.PI - theta1,
+      2 * Math.PI - theta2, true);
     c2d.closePath();
     c2d.fill();
 
     c2d.fillStyle = 'white';
     c2d.globalCompositeOperation = 'destination-out';
 
-    let tx = r + options.activePadding + rx/r*(rs + options.spotlightPadding - options.indicatorSize/4);
-    let ty = r + options.activePadding + ry/r*(rs + options.spotlightPadding - options.indicatorSize/4);
-    let rot = Math.PI/4 - theta;
+    let tx = r + options.activePadding + rx / r * (rs + options.spotlightPadding - options.indicatorSize / 4);
+    let ty = r + options.activePadding + ry / r * (rs + options.spotlightPadding - options.indicatorSize / 4);
+    let rot = Math.PI / 4 - theta;
 
-    c2d.translate( tx, ty );
-    c2d.rotate( rot );
+    c2d.translate(tx, ty);
+    c2d.rotate(rot);
 
     // clear the indicator
     c2d.beginPath();
-    c2d.fillRect(-options.indicatorSize/2, -options.indicatorSize/2, options.indicatorSize, options.indicatorSize);
+    c2d.fillRect(-options.indicatorSize / 2, -options.indicatorSize / 2, options.indicatorSize, options.indicatorSize);
     c2d.closePath();
     c2d.fill();
 
-    c2d.rotate( -rot );
-    c2d.translate( -tx, -ty );
+    c2d.rotate(-rot);
+    c2d.translate(-tx, -ty);
 
     // c2d.setTransform( 1, 0, 0, 1, 0, 0 );
 
     // clear the spotlight
     c2d.beginPath();
-    c2d.arc(r + options.activePadding, r + options.activePadding, rs + options.spotlightPadding, 0, Math.PI*2, true);
+    c2d.arc(r + options.activePadding, r + options.activePadding, rs + options.spotlightPadding, 0, Math.PI * 2, true);
     c2d.closePath();
     c2d.fill();
 
     c2d.globalCompositeOperation = 'source-over';
   }
 
-  function updatePixelRatio(){
+  function updatePixelRatio() {
     let pxr = getPixelRatio();
     let w = containerSize;
     let h = containerSize;
@@ -246,8 +249,8 @@ let cxtmenu = function(params){
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
 
-    c2d.setTransform( 1, 0, 0, 1, 0, 0 );
-    c2d.scale( pxr, pxr );
+    c2d.setTransform(1, 0, 0, 1, 0, 0);
+    c2d.scale(pxr, pxr);
   }
 
   let redrawing = true;
@@ -261,19 +264,19 @@ let cxtmenu = function(params){
     || (fn => setTimeout(fn, 16))
   );
 
-  let redraw = function(){
-    if( redrawQueue.drawBg ){
-      drawBg.apply( null, redrawQueue.drawBg );
+  let redraw = function () {
+    if (redrawQueue.drawBg) {
+      drawBg.apply(null, redrawQueue.drawBg);
     }
 
-    if( redrawQueue.drawCommands ){
-      drawCommands.apply( null, redrawQueue.drawCommands );
+    if (redrawQueue.drawCommands) {
+      drawCommands.apply(null, redrawQueue.drawCommands);
     }
 
     redrawQueue = {};
 
-    if( redrawing ){
-      raf( redraw );
+    if (redrawing) {
+      raf(redraw);
     }
   };
 
@@ -284,13 +287,13 @@ let cxtmenu = function(params){
   let ctrx, ctry, rs;
 
   let bindings = {
-    on: function(events, selector, fn){
+    on: function (events, selector, fn) {
 
       let _fn = fn;
-      if( selector === 'core'){
-        _fn = function( e ){
-          if( e.cyTarget === cy || e.target === cy ){ // only if event target is directly core
-            return fn.apply( this, [ e ] );
+      if (selector === 'core') {
+        _fn = function (e) {
+          if (e.cyTarget === cy || e.target === cy) { // only if event target is directly core
+            return fn.apply(this, [e]);
           }
         };
       }
@@ -301,9 +304,10 @@ let cxtmenu = function(params){
         fn: _fn
       });
 
-      if( selector === 'core' ){
+      if (selector === 'core') {
         cy.on(events, _fn);
-      } else {
+      }
+      else {
         cy.on(events, selector, _fn);
       }
 
@@ -311,7 +315,7 @@ let cxtmenu = function(params){
     }
   };
 
-  function addEventListeners(){
+  function addEventListeners() {
     let grabbable;
     let inGesture = false;
     let dragHandler;
@@ -320,31 +324,31 @@ let cxtmenu = function(params){
     let boxEnabled;
     let gestureStartEvent;
 
-    let restoreZoom = function(){
-      if( zoomEnabled ){
-        cy.userZoomingEnabled( true );
+    let restoreZoom = function () {
+      if (zoomEnabled) {
+        cy.userZoomingEnabled(true);
       }
     };
 
-    let restoreGrab = function(){
-      if( grabbable ){
+    let restoreGrab = function () {
+      if (grabbable) {
         target.grabify();
       }
     };
 
-    let restorePan = function(){
-      if( panEnabled ){
-        cy.userPanningEnabled( true );
+    let restorePan = function () {
+      if (panEnabled) {
+        cy.userPanningEnabled(true);
       }
     };
 
-    let restoreBoxSeln = function(){
-      if( boxEnabled ){
-        cy.boxSelectionEnabled( true );
+    let restoreBoxSeln = function () {
+      if (boxEnabled) {
+        cy.boxSelectionEnabled(true);
       }
     };
 
-    let restoreGestures = function(){
+    let restoreGestures = function () {
       restoreGrab();
       restoreZoom();
       restorePan();
@@ -354,11 +358,10 @@ let cxtmenu = function(params){
     window.addEventListener('resize', updatePixelRatio);
 
     bindings
-      .on('resize', function(){
+      .on('resize', function () {
         updatePixelRatio();
       })
-
-      .on(options.openMenuEvents, options.selector, function(e){
+      .on(options.openMenuEvents, options.selector, function (e) {
         target = this; // Remember which node the context menu is for
         let ele = this;
         let isCy = this === cy;
@@ -371,45 +374,50 @@ let cxtmenu = function(params){
           restoreGestures();
         }
 
-        if( typeof options.commands === 'function' ){
+        if (typeof options.commands === 'function') {
           const res = options.commands(target);
-          if( res.then ){
+          if (res.then) {
             res.then(_commands => {
               commands = _commands;
               openMenu();
-            })
-          } else {
+            });
+          }
+          else {
             commands = res;
             openMenu();
           }
-        } else {
+        }
+        else {
           commands = options.commands;
           openMenu();
         }
 
-        function openMenu(){
-          if( !commands || commands.length === 0 ){ return; }
+        function openMenu() {
+          if (!commands || commands.length === 0) {
+            return;
+          }
 
           zoomEnabled = cy.userZoomingEnabled();
-          cy.userZoomingEnabled( false );
+          cy.userZoomingEnabled(false);
 
           panEnabled = cy.userPanningEnabled();
-          cy.userPanningEnabled( false );
+          cy.userPanningEnabled(false);
 
           boxEnabled = cy.boxSelectionEnabled();
-          cy.boxSelectionEnabled( false );
+          cy.boxSelectionEnabled(false);
 
-          grabbable = target.grabbable &&  target.grabbable();
-          if( grabbable ){
+          grabbable = target.grabbable && target.grabbable();
+          if (grabbable) {
             target.ungrabify();
           }
 
           let rp, rw, rh;
-          if( !isCy && ele.isNode() && !ele.isParent() && !options.atMouse ){
+          if (!isCy && ele.isNode() && !ele.isParent() && !options.atMouse) {
             rp = ele.renderedPosition();
             rw = ele.renderedWidth();
             rh = ele.renderedHeight();
-          } else {
+          }
+          else {
             rp = e.renderedPosition || e.cyRenderedPosition;
             rw = 1;
             rh = 1;
@@ -428,7 +436,7 @@ let cxtmenu = function(params){
             top: (rp.y - r) + 'px'
           });
 
-          rs = Math.max(rw, rh)/2;
+          rs = Math.max(rw, rh) / 2;
           rs = Math.max(rs, options.minSpotlightRadius);
           rs = Math.min(rs, options.maxSpotlightRadius);
 
@@ -440,10 +448,11 @@ let cxtmenu = function(params){
           gestureStartEvent = e;
         }
       })
+      .on('cxtdrag tapdrag tapstart', options.selector, dragHandler = function (e) {
 
-      .on('cxtdrag tapdrag', options.selector, dragHandler = function(e){
-
-        if( !inGesture ){ return; }
+        if (!inGesture) {
+          return;
+        }
 
         let origE = e.originalEvent;
         let isTouch = origE.touches && origE.touches.length > 0;
@@ -456,41 +465,43 @@ let cxtmenu = function(params){
         let dx = pageX - offset.left - ctrx;
         let dy = pageY - offset.top - ctry;
 
-        if( dx === 0 ){ dx = 0.01; }
+        if (dx === 0) {
+          dx = 0.01;
+        }
 
-        let d = Math.sqrt( dx*dx + dy*dy );
-        let cosTheta = (dy*dy - d*d - dx*dx)/(-2 * d * dx);
-        let theta = Math.acos( cosTheta );
+        let d = Math.sqrt(dx * dx + dy * dy);
+        let cosTheta = (dy * dy - d * d - dx * dx) / (-2 * d * dx);
+        let theta = Math.acos(cosTheta);
 
-        if( d < rs + options.spotlightPadding ){
+        if (d < rs + options.spotlightPadding || d > options.menuRadius) {
           queueDrawBg();
           return;
         }
 
         queueDrawBg();
 
-        let rx = dx*r / d;
-        let ry = dy*r / d;
+        let rx = dx * r / d;
+        let ry = dy * r / d;
 
-        if( dy > 0 ){
+        if (dy > 0) {
           theta = Math.PI + Math.abs(theta - Math.PI);
         }
 
-        let dtheta = 2*Math.PI/(commands.length);
-        let theta1 = Math.PI/2;
+        let dtheta = 2 * Math.PI / (commands.length);
+        let theta1 = Math.PI / 2;
         let theta2 = theta1 + dtheta;
 
-        for( let i = 0; i < commands.length; i++ ){
+        for (let i = 0; i < commands.length; i++) {
           let command = commands[i];
 
           let inThisCommand = theta1 <= theta && theta <= theta2
-            || theta1 <= theta + 2*Math.PI && theta + 2*Math.PI <= theta2;
+            || theta1 <= theta + 2 * Math.PI && theta + 2 * Math.PI <= theta2;
 
-          if( command.disabled === true || command.enabled === false ){
+          if (command.disabled === true || command.enabled === false) {
             inThisCommand = false;
           }
 
-          if( inThisCommand ){
+          if (inThisCommand) {
             activeCommandI = i;
             break;
           }
@@ -499,19 +510,17 @@ let cxtmenu = function(params){
           theta2 += dtheta;
         }
 
-        queueDrawCommands( rx, ry, theta );
+        queueDrawCommands(rx, ry, theta);
       })
-
-      .on('tapdrag', dragHandler)
-
-      .on('cxttapend tapend', function(){
+      .on('tapdrag tapstart', dragHandler)
+      .on('tapend', function () {
         parent.style.display = 'none';
 
-        if( activeCommandI !== undefined ){
-          let select = commands[ activeCommandI ].select;
+        if (activeCommandI !== undefined) {
+          let select = commands[activeCommandI].select;
 
-          if( select ){
-            select.apply( target, [target, gestureStartEvent] );
+          if (select) {
+            select.apply(target, [target, gestureStartEvent]);
             activeCommandI = undefined;
           }
         }
@@ -519,19 +528,19 @@ let cxtmenu = function(params){
         inGesture = false;
 
         restoreGestures();
-      })
-    ;
+      });
   }
 
-  function removeEventListeners(){
+  function removeEventListeners() {
     let handlers = data.handlers;
 
-    for( let i = 0; i < handlers.length; i++ ){
+    for (let i = 0; i < handlers.length; i++) {
       let h = handlers[i];
 
-      if( h.selector === 'core' ){
+      if (h.selector === 'core') {
         cy.off(h.events, h.fn);
-      } else {
+      }
+      else {
         cy.off(h.events, h.selector, h.fn);
       }
     }
@@ -539,7 +548,7 @@ let cxtmenu = function(params){
     window.removeEventListener('resize', updatePixelRatio);
   }
 
-  function destroyInstance(){
+  function destroyInstance() {
     redrawing = false;
 
     removeEventListeners();
@@ -550,7 +559,7 @@ let cxtmenu = function(params){
   addEventListeners();
 
   return {
-    destroy: function(){
+    destroy: function () {
       destroyInstance();
     }
   };
