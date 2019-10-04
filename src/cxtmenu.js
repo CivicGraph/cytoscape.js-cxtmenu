@@ -363,12 +363,9 @@ let cxtmenu = function (params) {
         updatePixelRatio();
       })
       .on(options.openMenuEvents, options.selector, function (e) {
-        console.log(e);
         target = this; // Remember which node the context menu is for
         let ele = this;
         let isCy = this === cy;
-
-        console.log(commandJustExecuted);
 
         if (!commandJustExecuted) {
           if (inGesture) {

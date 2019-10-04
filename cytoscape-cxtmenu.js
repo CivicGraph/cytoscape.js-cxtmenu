@@ -408,6 +408,7 @@ var cxtmenu = function cxtmenu(params) {
     var panEnabled = void 0;
     var boxEnabled = void 0;
     var gestureStartEvent = void 0;
+    var commandJustExecuted = false;
 
     var restoreZoom = function restoreZoom() {
       if (zoomEnabled) {
@@ -449,28 +450,30 @@ var cxtmenu = function cxtmenu(params) {
       var ele = this;
       var isCy = this === cy;
 
-      if (inGesture) {
-        parent.style.display = 'none';
+      if (!commandJustExecuted) {
+        if (inGesture) {
+          parent.style.display = 'none';
 
-        inGesture = false;
+          inGesture = false;
 
-        restoreGestures();
-      }
+          restoreGestures();
+        }
 
-      if (typeof options.commands === 'function') {
-        var res = options.commands(target);
-        if (res.then) {
-          res.then(function (_commands) {
-            commands = _commands;
+        if (typeof options.commands === 'function') {
+          var res = options.commands(target);
+          if (res.then) {
+            res.then(function (_commands) {
+              commands = _commands;
+              openMenu();
+            });
+          } else {
+            commands = res;
             openMenu();
-          });
+          }
         } else {
-          commands = res;
+          commands = options.commands;
           openMenu();
         }
-      } else {
-        commands = options.commands;
-        openMenu();
       }
 
       function openMenu() {
@@ -529,7 +532,7 @@ var cxtmenu = function cxtmenu(params) {
         inGesture = true;
         gestureStartEvent = e;
       }
-    }).on('cxtdrag tapdrag tapstart', options.selector, dragHandler = function dragHandler(e) {
+    }).on('tapdrag tapstart', options.selector, dragHandler = function dragHandler(e) {
 
       if (!inGesture) {
         return;
@@ -554,7 +557,7 @@ var cxtmenu = function cxtmenu(params) {
       var cosTheta = (dy * dy - d * d - dx * dx) / (-2 * d * dx);
       var theta = Math.acos(cosTheta);
 
-      if (d < rs + options.spotlightPadding || d > options.menuRadius) {
+      if (d < rs + options.spotlightPadding || d > containerSize / 2) {
         queueDrawBg();
         return;
       }
@@ -591,7 +594,7 @@ var cxtmenu = function cxtmenu(params) {
       }
 
       queueDrawCommands(rx, ry, theta);
-    }).on('tapdrag tapstart', dragHandler).on('tapend', function () {
+    }).on('tapdrag tapstart', dragHandler).on('tapend', function (e) {
       parent.style.display = 'none';
 
       if (activeCommandI !== undefined) {
@@ -600,11 +603,14 @@ var cxtmenu = function cxtmenu(params) {
         if (select) {
           select.apply(target, [target, gestureStartEvent]);
           activeCommandI = undefined;
+          commandJustExecuted = true;
+          setTimeout(function () {
+            commandJustExecuted = false;
+          }, 500);
         }
       }
 
       inGesture = false;
-
       restoreGestures();
     });
   }
@@ -700,7 +706,8 @@ var defaults = {
   spotlightPadding: 4, // extra spacing in pixels between the element and the spotlight
   minSpotlightRadius: 24, // the minimum radius in pixels of the spotlight
   maxSpotlightRadius: 38, // the maximum radius in pixels of the spotlight
-  openMenuEvents: 'cxttapstart taphold', // space-separated cytoscape events that will open the menu; only `cxttapstart` and/or `taphold` work here
+  openMenuEvents: 'tap taphold', // space-separated cytoscape events that will open the menu; only `cxttapstart`
+  // and/or `taphold` work here
   itemColor: 'white', // the colour of text in the command's content
   itemTextShadowColor: 'transparent', // the text shadow colour of the command's content
   zIndex: 9999, // the z-index of the ui div
